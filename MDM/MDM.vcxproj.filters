@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="cli">
+      <UniqueIdentifier>{8dfa6431-9ca5-4b9c-bfd1-b90ee954e5a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{64a6a8e4-fcb2-4fd5-891a-10cece9b1bb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{5859a392-48a8-42a9-99e2-28404a95b67a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{5636ca56-a0a9-4868-8e1a-486366a824f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="monitor">
+      <UniqueIdentifier>{893f0da7-b6ad-4136-a2ac-c4bbdd8ff043}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cli\ArgumentParser.cpp">
+      <Filter>cli</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ConnectionPool.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\DownloadController.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\DownloadWorker.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\SegmentQueue.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ThreadPool.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="io\FileWriter.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="io\MetadataStore.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="net\HttpClient.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="monitor\Logger.cpp">
+      <Filter>monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="monitor\ProgressTracker.cpp">
+      <Filter>monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cli\ArgumentParser.h">
+      <Filter>cli</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ConnectionPool.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\DownloadController.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\DownloadWorker.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\SegmentQueue.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ThreadPool.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="io\FileWriter.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\MetadataStore.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="net\HttpClient.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="monitor\Logger.h">
+      <Filter>monitor</Filter>
+    </ClInclude>
+    <ClInclude Include="monitor\ProgressTracker.h">
+      <Filter>monitor</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utils.h">
+      <Filter>core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

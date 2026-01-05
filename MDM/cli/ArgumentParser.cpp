@@ -1,0 +1,82 @@
+#include "ArgumentParser.h"
+#include <iostream>
+#include <cstdlib>
+
+namespace {
+std::string deriveOutputFromUrl(const std::string& url) {
+    // Lấy tên file từ cuối URL, bỏ query/fragment nếu có
+    auto slash = url.find_last_of('/');
+    std::string name = (slash == std::string::npos) ? url : url.substr(slash + 1);
+
+    auto special = name.find_first_of("?#");
+    if (special != std::string::npos)
+        name = name.substr(0, special);
+
+    if (name.empty())
+        name = "download";
+
+    return name;
+}
+}
+
+bool ArgumentParser::parse(int argc, char* argv[], DownloadConfig& out) {
+    if (argc < 2) {
+        printUsage();
+        return false;
+    }
+
+    out.url.clear();
+    out.outputPath.clear();
+    out.maxThreads = 4;
+    out.segmentSize = 1 * 1024 * 1024;
+    out.resume = false;
+    out.verbose = false;
+
+    out.url = argv[1];
+
+    for (int i = 2; i < argc; ++i) {
+        std::string arg = argv[i];
+
+        if (arg == "-o" && i + 1 < argc) {
+            out.outputPath = argv[++i];
+        }
+        else if (arg == "-t" && i + 1 < argc) {
+            out.maxThreads = std::stoul(argv[++i]);
+        }
+        else if (arg == "-s" && i + 1 < argc) {
+            out.segmentSize = std::stoull(argv[++i]);
+        }
+        else if (arg == "--resume") {
+            out.resume = true;
+        }
+        else if (arg == "--verbose") {
+            out.verbose = true;
+        }
+        else {
+            printUsage();
+            return false;
+        }
+    }
+
+    // Tự động đặt tên file theo URL nếu không cung cấp -o
+    if (out.outputPath.empty())
+        out.outputPath = deriveOutputFromUrl(out.url);
+
+    if (out.maxThreads == 0 || out.segmentSize == 0) {
+        return false;
+    }
+
+    return true;
+}
+
+void ArgumentParser::printUsage() const {
+    std::cout <<
+        "Usage:\n"
+        "  mdm <url> [-o <output>] [options]\n\n"
+        "Options:\n"
+        "  -o <file>        Output file path (mặc định: lấy tên từ URL)\n"
+        "  -t <threads>     Max threads (default: 4)\n"
+        "  -s <bytes>       Segment size (default: 1MB)\n"
+        "  --resume         Resume download\n"
+        "  --verbose        Verbose logging\n";
+}
