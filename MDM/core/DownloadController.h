@@ -1,6 +1,10 @@
 #pragma once
 #include <atomic>
 #include <memory>
+#include <mutex>
+#include <cstddef>
+#include <csignal>
+#include <chrono>
 
 #include "utils.h"
 #include "SegmentQueue.h"
@@ -14,7 +18,7 @@
 
 class DownloadController {
 public:
-    explicit DownloadController(const DownloadConfig& config);
+    explicit DownloadController(const DownloadConfig& config, volatile std::sig_atomic_t* externalStop = nullptr);
 
     bool start();
     void stop();
@@ -24,8 +28,11 @@ private:
     bool initMetadata();
     void spawnWorkers();
     bool allSegmentsDone() const;
+    void persistMetadataSnapshot();
+    DownloadMetadata buildMetadataSnapshot();
 private:
     const DownloadConfig& cfg;
+    volatile std::sig_atomic_t* externalStopSignal{ nullptr };
 
     std::atomic<bool> stopFlag{ false };
 
@@ -39,4 +46,11 @@ private:
     Logger logger;
 
     DownloadMetadata metadata;
+    std::mutex metadataMutex;
+    std::atomic<bool> encounteredError{ false };
+    std::mutex errorMutex;
+    std::string lastError;
+    bool supportsRange{ false };
+    std::size_t workerCount{ 0 };
+    std::chrono::steady_clock::time_point lastMetadataSave;
 };

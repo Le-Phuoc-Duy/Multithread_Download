@@ -27,10 +27,9 @@ bool ArgumentParser::parse(int argc, char* argv[], DownloadConfig& out) {
 
     out.url.clear();
     out.outputPath.clear();
-    out.maxThreads = 4;
+    out.maxThreads = 0; // 0 = auto select threads
     out.segmentSize = 1 * 1024 * 1024;
     out.resume = false;
-    out.verbose = false;
 
     out.url = argv[1];
 
@@ -49,9 +48,6 @@ bool ArgumentParser::parse(int argc, char* argv[], DownloadConfig& out) {
         else if (arg == "--resume") {
             out.resume = true;
         }
-        else if (arg == "--verbose") {
-            out.verbose = true;
-        }
         else {
             printUsage();
             return false;
@@ -62,7 +58,7 @@ bool ArgumentParser::parse(int argc, char* argv[], DownloadConfig& out) {
     if (out.outputPath.empty())
         out.outputPath = deriveOutputFromUrl(out.url);
 
-    if (out.maxThreads == 0 || out.segmentSize == 0) {
+    if (out.segmentSize == 0) {
         return false;
     }
 
@@ -74,9 +70,8 @@ void ArgumentParser::printUsage() const {
         "Usage:\n"
         "  mdm <url> [-o <output>] [options]\n\n"
         "Options:\n"
-        "  -o <file>        Output file path (mặc định: lấy tên từ URL)\n"
-        "  -t <threads>     Max threads (default: 4)\n"
+        "  -o <file>        Output file path (default: name from url)\n"
+        "  -t <threads>     Max threads (default: auto)\n"
         "  -s <bytes>       Segment size (default: 1MB)\n"
-        "  --resume         Resume download\n"
-        "  --verbose        Verbose logging\n";
+        "  --resume         Resume download\n";
 }

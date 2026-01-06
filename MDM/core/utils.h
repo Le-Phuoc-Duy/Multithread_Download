@@ -12,7 +12,6 @@ struct DownloadConfig {
     std::size_t maxThreads;
 
     bool resume;
-    bool verbose;
 };
 
 enum class SegmentState {
