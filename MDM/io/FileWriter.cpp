@@ -17,7 +17,7 @@ FileWriter::FileWriter(const std::string& path, std::uint64_t fileSize)
     : filePath(path), totalSize(fileSize) {
 }
 
-bool FileWriter::open(bool resume) {
+bool FileWriter::open() {
 #ifdef _WIN32
     int flags = _O_BINARY | _O_RDWR | _O_CREAT;
     int mode = _S_IREAD | _S_IWRITE;
@@ -26,7 +26,7 @@ bool FileWriter::open(bool resume) {
     int mode = 0644;
 #endif
 
-    if (!resume && fs::exists(filePath)) {
+    if (fs::exists(filePath)) {
         fs::remove(filePath);
     }
 

@@ -84,7 +84,6 @@ bool HttpClient::getRange(std::uint64_t offset,
     long status = 0;
     curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &status);
 
-    // 🔑 DÒNG QUYẾT ĐỊNH
     return status == 206;
 }
 

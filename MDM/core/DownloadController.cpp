@@ -20,7 +20,7 @@ bool DownloadController::start() {
 
     progress.reset(metadata.fileSize);
 
-    // Chọn số thread: ưu tiên giá trị người dùng, nếu 0 => auto theo CPU và server
+    // Decide numbers of thread
     workerCount = cfg.maxThreads;
     if (workerCount == 0) {
         std::size_t hw = std::thread::hardware_concurrency();
@@ -40,7 +40,7 @@ bool DownloadController::start() {
     connectionPool = std::make_unique<ConnectionPool>(cfg.url, workerCount);
 
     fileWriter = std::make_unique<FileWriter>(cfg.outputPath, metadata.fileSize);
-    if (!fileWriter->open(cfg.resume))
+    if (!fileWriter->open())
         return false;
 
     segmentQueue = std::make_unique<SegmentQueue>(metadata.segments);
@@ -50,9 +50,8 @@ bool DownloadController::start() {
 
     const auto startTime = std::chrono::steady_clock::now();
     auto lastProgressLog = startTime;
-    lastMetadataSave = startTime;
 
-    // Chờ tải xong mọi segment, log tiến trình định kỳ
+    // Log progress
     while (!stopFlag.load(std::memory_order_relaxed)) {
         if (externalStopSignal && *externalStopSignal != 0)
             stopFlag.store(true, std::memory_order_relaxed);
@@ -72,11 +71,6 @@ bool DownloadController::start() {
 
             logger.log(os.str());
             lastProgressLog = now;
-        }
-
-        if (now - lastMetadataSave >= std::chrono::seconds(2)) {
-            persistMetadataSnapshot();
-            lastMetadataSave = now;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -123,7 +117,7 @@ bool DownloadController::start() {
         logger.log(conclusion.str());
     }
 
-    stop(); // join thread, lưu meta, đóng file
+    stop();
     return allSegmentsDone();
 }
 
@@ -144,15 +138,10 @@ void DownloadController::stop() {
     if (fileWriter)
         fileWriter->close();
 
-    if (metadataStore)
-        metadataStore->save(buildMetadataSnapshot());
-    
     logger.stop();
 }
 
 bool DownloadController::initMetadata() {
-    metadataStore = std::make_unique<MetadataStore>(cfg.outputPath + ".meta");
-
     HttpClient client(cfg.url);
     HttpHeadResult head{};
 
@@ -160,36 +149,6 @@ bool DownloadController::initMetadata() {
         return false;
     supportsRange = head.acceptRanges;
 
-    if (cfg.resume && metadataStore->exists()) {
-        if (!metadataStore->load(metadata))
-            return false;
-
-        if (!metadataStore->validate(metadata, head.etag, head.contentLength)) {
-            if (metadata.fileSize != head.contentLength) {
-                logger.log("Resume validation failed: file size changed (local " +
-                    std::to_string(metadata.fileSize) + ", remote " +
-                    std::to_string(head.contentLength) + "). Delete .meta to restart.");
-            }
-            else if (!metadata.etag.empty() && metadata.etag != head.etag) {
-                logger.log("Resume validation failed: remote ETag changed (local " +
-                    metadata.etag + ", remote " + head.etag + "). Delete .meta to restart.");
-            }
-            else {
-                logger.log("Resume validation failed: metadata mismatch. Delete .meta to restart.");
-            }
-            return false;
-        }
-
-        // Nếu có segment đang InProgress (từ lần ngắt trước), gán lại Pending để có thể tải tiếp
-        for (auto& seg : metadata.segments) {
-            if (seg.state == SegmentState::InProgress)
-                seg.state = SegmentState::Pending;
-        }
-
-        return true;
-    }
-
-    // Fresh download
     metadata.url = cfg.url;
     metadata.etag = head.etag;
     metadata.fileSize = head.contentLength;
@@ -216,7 +175,7 @@ bool DownloadController::initMetadata() {
         offset += size;
     }
 
-    return metadataStore->save(metadata);
+    return true;
 }
 
 void DownloadController::spawnWorkers() {
@@ -225,7 +184,7 @@ void DownloadController::spawnWorkers() {
         DownloadWorker worker(
             *segmentQueue,
             *fileWriter,
-            *connectionPool,   // ✅ đúng
+            *connectionPool,
             [this](const WorkerReport& rep) {
                 onWorkerReport(rep);
             },
@@ -258,29 +217,3 @@ void DownloadController::onWorkerReport(const WorkerReport& report) {
     }
 }
 
-void DownloadController::persistMetadataSnapshot() {
-    if (!metadataStore || !segmentQueue)
-        return;
-
-    auto snapshot = buildMetadataSnapshot();
-    metadataStore->save(snapshot);
-}
-
-DownloadMetadata DownloadController::buildMetadataSnapshot() {
-    DownloadMetadata snapshot;
-    {
-        std::lock_guard<std::mutex> lock(metadataMutex);
-        snapshot = metadata;
-    }
-
-    if (segmentQueue) {
-        snapshot.segments = segmentQueue->snapshot();
-        // Nếu có segment đang InProgress, đặt lại Pending để resume sẽ tải lại
-        for (auto& seg : snapshot.segments) {
-            if (seg.state == SegmentState::InProgress)
-                seg.state = SegmentState::Pending;
-        }
-    }
-
-    return snapshot;
-}

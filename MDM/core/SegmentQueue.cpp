@@ -34,8 +34,3 @@ bool SegmentQueue::hasPending() const {
     }
     return false;
 }
-
-std::vector<Segment> SegmentQueue::snapshot() const {
-    std::lock_guard<std::mutex> lock(mtx);
-    return segmentsRef;
-}

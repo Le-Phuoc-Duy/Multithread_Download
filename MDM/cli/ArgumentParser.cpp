@@ -4,7 +4,7 @@
 
 namespace {
 std::string deriveOutputFromUrl(const std::string& url) {
-    // Lấy tên file từ cuối URL, bỏ query/fragment nếu có
+    // Get file name from url
     auto slash = url.find_last_of('/');
     std::string name = (slash == std::string::npos) ? url : url.substr(slash + 1);
 
@@ -29,7 +29,6 @@ bool ArgumentParser::parse(int argc, char* argv[], DownloadConfig& out) {
     out.outputPath.clear();
     out.maxThreads = 0; // 0 = auto select threads
     out.segmentSize = 1 * 1024 * 1024;
-    out.resume = false;
 
     out.url = argv[1];
 
@@ -45,16 +44,12 @@ bool ArgumentParser::parse(int argc, char* argv[], DownloadConfig& out) {
         else if (arg == "-s" && i + 1 < argc) {
             out.segmentSize = std::stoull(argv[++i]);
         }
-        else if (arg == "--resume") {
-            out.resume = true;
-        }
         else {
             printUsage();
             return false;
         }
     }
 
-    // Tự động đặt tên file theo URL nếu không cung cấp -o
     if (out.outputPath.empty())
         out.outputPath = deriveOutputFromUrl(out.url);
 
@@ -72,6 +67,5 @@ void ArgumentParser::printUsage() const {
         "Options:\n"
         "  -o <file>        Output file path (default: name from url)\n"
         "  -t <threads>     Max threads (default: auto)\n"
-        "  -s <bytes>       Segment size (default: 1MB)\n"
-        "  --resume         Resume download\n";
+        "  -s <bytes>       Segment size (default: 1MB)\n";
 }

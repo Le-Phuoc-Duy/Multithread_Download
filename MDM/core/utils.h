@@ -10,8 +10,6 @@ struct DownloadConfig {
 
     std::size_t segmentSize;
     std::size_t maxThreads;
-
-    bool resume;
 };
 
 enum class SegmentState {

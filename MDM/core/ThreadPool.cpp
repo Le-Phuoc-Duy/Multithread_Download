@@ -21,7 +21,6 @@ void ThreadPool::scaleUp(std::size_t n, WorkerFn worker) {
 }
 
 void ThreadPool::scaleDown(std::size_t n) {
-    // scaleDown mềm: báo stop, join dần
     std::lock_guard<std::mutex> lock(mtx);
 
     std::size_t removeCount = std::min(n, threads.size());

@@ -11,7 +11,6 @@
 #include "ThreadPool.h"
 #include "DownloadWorker.h"
 #include "../io/FileWriter.h"
-#include "../io/MetadataStore.h"
 #include "../net/HttpClient.h"
 #include "../monitor/ProgressTracker.h"
 #include "../monitor/Logger.h"
@@ -28,15 +27,12 @@ private:
     bool initMetadata();
     void spawnWorkers();
     bool allSegmentsDone() const;
-    void persistMetadataSnapshot();
-    DownloadMetadata buildMetadataSnapshot();
 private:
     const DownloadConfig& cfg;
     volatile std::sig_atomic_t* externalStopSignal{ nullptr };
 
     std::atomic<bool> stopFlag{ false };
 
-    std::unique_ptr<MetadataStore> metadataStore;
     std::unique_ptr<FileWriter> fileWriter;
     std::unique_ptr<SegmentQueue> segmentQueue;
     std::unique_ptr<ThreadPool> threadPool;
@@ -52,5 +48,4 @@ private:
     std::string lastError;
     bool supportsRange{ false };
     std::size_t workerCount{ 0 };
-    std::chrono::steady_clock::time_point lastMetadataSave;
 };

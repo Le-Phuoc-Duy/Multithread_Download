@@ -27,7 +27,7 @@ void DownloadWorker::run() {
         rep.bytesDownloaded = 0;
         rep.success = false;
 
-        // 🔑 mượn connection
+        // Get connection
         auto client = connectionPool.acquire();
 
         bool ok = client->getRange(
@@ -41,7 +41,6 @@ void DownloadWorker::run() {
                 return true;
             });
 
-        // 🔑 trả connection
         connectionPool.release(std::move(client));
 
         if (ok) {

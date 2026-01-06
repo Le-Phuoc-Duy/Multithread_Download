@@ -12,7 +12,6 @@ public:
     void markDone(std::uint64_t segmentIndex);
 
     bool hasPending() const;
-    std::vector<Segment> snapshot() const;
 
 private:
     std::vector<Segment>& segmentsRef;

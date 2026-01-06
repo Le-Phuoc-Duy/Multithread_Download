@@ -8,7 +8,7 @@ class FileWriter
 public:
     FileWriter(const std::string& path, std::uint64_t fileSize);
 
-    bool open(bool resume);
+    bool open();
     bool write(std::uint64_t offset, const char* data, std::size_t size);
     void flush();
     void close();

@@ -25,5 +25,4 @@ void ConnectionPool::release(std::unique_ptr<HttpClient> client) {
     if (pool.size() < maxPoolSize) {
         pool.push(std::move(client));
     }
-    // else: drop connection, destructor cleanup
 }
